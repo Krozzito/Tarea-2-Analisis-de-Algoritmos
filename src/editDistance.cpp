@@ -39,7 +39,7 @@ int editDistanceMemo(std::string &s, std::string &t, int i, int j, std::vector<s
 
     return dp[i][j];
 }
-int editDistanceInsertDelete(const std::string& s, const std::string& t) {
+int editDistanceDP(std::string& s, std::string& t) {
     int n = s.length();
     int m = t.length();
 
@@ -65,4 +65,29 @@ int editDistanceInsertDelete(const std::string& s, const std::string& t) {
         }
     }
     return dp[n][m];
+}
+int editDistanceDPOptimized(std::string& s, std::string& t) {
+    int n = s.length(), m = t.length();
+
+    std::vector<int> prev(m + 1), curr(m + 1);
+
+    // Inicialización base: dp[0][j] = j
+    for (int j = 0; j <= m; ++j)
+        prev[j] = j;
+
+    for (int i = 1; i <= n; ++i) {
+        curr[0] = i; // dp[i][0] = i (eliminar todo s[0..i])
+        for (int j = 1; j <= m; ++j) {
+            if (s[i - 1] == t[j - 1]) {
+                curr[j] = prev[j - 1];
+            } else {
+                int insertOp = curr[j - 1];
+                int deleteOp = prev[j];
+                curr[j] = 1 + std::min(insertOp, deleteOp);
+            }
+        }
+        std::swap(prev, curr); // La fila actual se convierte en la anterior
+    }
+
+    return prev[m]; // La última fila válida es `prev`
 }
